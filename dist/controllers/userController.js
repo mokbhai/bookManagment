@@ -13,6 +13,12 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const userService_1 = __importDefault(require("../services/userService"));
+/**
+ * Controller function to create a new user.
+ *
+ * @param req - Express request object containing user data in the body
+ * @param res - Express response object used to send back the HTTP response
+ */
 const createUser = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const userData = req.body;
@@ -25,12 +31,18 @@ const createUser = (req, res) => __awaiter(void 0, void 0, void 0, function* () 
         res.status(400).json({ message: error.message });
     }
 });
+/**
+ * Controller function to retrieve all users.
+ *
+ * @param req - Express request object
+ * @param res - Express response object used to send back the HTTP response
+ */
 const getAllUsers = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const users = yield userService_1.default.getAllUsers();
         res
-            .status(201)
-            .json({ success: true, message: "Users Found successfully", users });
+            .status(200)
+            .json({ success: true, message: "Users found successfully", users });
     }
     catch (error) {
         res.status(400).json({ message: error.message });

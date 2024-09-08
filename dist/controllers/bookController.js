@@ -13,6 +13,10 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const bookService_1 = __importDefault(require("../services/bookService"));
+/**
+ * Controller function to create a new book.
+ * Handles the HTTP request and response for creating a book.
+ */
 const createBook = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const bookData = req.body;
@@ -25,6 +29,10 @@ const createBook = (req, res) => __awaiter(void 0, void 0, void 0, function* () 
         res.status(400).json({ message: error.message });
     }
 });
+/**
+ * Controller function to retrieve books based on query parameters.
+ * Handles the HTTP request and response for fetching books.
+ */
 const getBooks = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const query = req.query;
@@ -35,4 +43,5 @@ const getBooks = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
         res.status(500).json({ message: error.message });
     }
 });
+// Export the controller functions for use in routes
 exports.default = { createBook, getBooks };

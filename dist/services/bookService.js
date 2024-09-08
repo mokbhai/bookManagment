@@ -12,8 +12,15 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-// src/services/bookService.ts
+// Import the Book model and IBook interface
 const book_1 = __importDefault(require("../models/book"));
+/**
+ * Creates a new book in the database.
+ *
+ * @param bookData - The data of the book to be created
+ * @returns The created book document
+ * @throws Error if the book cannot be created
+ */
 const createBook = (bookData) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const book = new book_1.default(bookData);
@@ -24,6 +31,12 @@ const createBook = (bookData) => __awaiter(void 0, void 0, void 0, function* () 
         throw new Error(`Unable to create book: ${error.message}`);
     }
 });
+/**
+ * Finds books based on query parameters.
+ *
+ * @param query - The query parameters to filter books
+ * @returns An array of books that match the query criteria
+ */
 const findBooks = (query) => __awaiter(void 0, void 0, void 0, function* () {
     const filter = {};
     if (query && query.term) {
@@ -40,12 +53,19 @@ const findBooks = (query) => __awaiter(void 0, void 0, void 0, function* () {
     }
     return yield book_1.default.find(filter);
 });
+/**
+ * Finds a book by its name.
+ *
+ * @param bookName - The name of the book to find
+ * @returns The found book document
+ * @throws Error if the book is not found
+ */
 const findOneByName = (bookName) => __awaiter(void 0, void 0, void 0, function* () {
-    // Find the book by name
     const book = yield book_1.default.findOne({ bookName: new RegExp(bookName, "i") });
     if (!book) {
         throw new Error("Book not found");
     }
     return book;
 });
+// Export the service functions for use in controllers
 exports.default = { createBook, findBooks, findOneByName };

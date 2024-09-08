@@ -1,3 +1,4 @@
+// src/index.ts
 import express from "express";
 import bodyParser from "body-parser";
 import connectDB from "./config/db";
@@ -5,6 +6,7 @@ import Routes from "./routes/index";
 
 const app = express();
 
+// Connect to the database
 connectDB();
 
 app.use(bodyParser.json());

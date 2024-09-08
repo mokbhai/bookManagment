@@ -1,13 +1,14 @@
-// src/controllers/bookService.ts
 import { Request, Response } from "express";
 import bookService from "../services/bookService";
 
+/**
+ * Controller function to create a new book.
+ * Handles the HTTP request and response for creating a book.
+ */
 const createBook = async (req: Request, res: Response) => {
   try {
     const bookData = req.body;
-
     const book = await bookService.createBook(bookData);
-
     res
       .status(201)
       .json({ success: true, message: "Book created successfully", book });
@@ -16,6 +17,10 @@ const createBook = async (req: Request, res: Response) => {
   }
 };
 
+/**
+ * Controller function to retrieve books based on query parameters.
+ * Handles the HTTP request and response for fetching books.
+ */
 const getBooks = async (req: Request, res: Response) => {
   try {
     const query: any = req.query;
@@ -26,4 +31,5 @@ const getBooks = async (req: Request, res: Response) => {
   }
 };
 
+// Export the controller functions for use in routes
 export default { createBook, getBooks };

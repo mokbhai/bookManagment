@@ -1,8 +1,15 @@
-// src/services/userService.ts
 import mongoose from "mongoose";
 import User, { IUser } from "../models/user";
 import validator from "validator";
 
+/**
+ * Service function to create a new user.
+ * Validates the user data and saves it to the database.
+ *
+ * @param userData - The data of the user to be created
+ * @returns The created user document
+ * @throws Error if validation fails or user creation is unsuccessful
+ */
 const createUser = async (userData: IUser) => {
   if (!userData.name || typeof userData.name !== "string") {
     throw new Error("Invalid or missing name");
@@ -30,6 +37,13 @@ const createUser = async (userData: IUser) => {
   }
 };
 
+/**
+ * Service function to find a user by either their ID or name.
+ *
+ * @param userIdOrName - The ID or name of the user to find
+ * @returns The found user document
+ * @throws Error if the user is not found or if an error occurs during the search
+ */
 const findOneByNameOrId = async (userIdOrName: string) => {
   try {
     const userId = mongoose.Types.ObjectId.isValid(userIdOrName)
@@ -48,6 +62,12 @@ const findOneByNameOrId = async (userIdOrName: string) => {
   }
 };
 
+/**
+ * Service function to retrieve all users from the database.
+ *
+ * @returns An array of user documents
+ * @throws Error if no users are found
+ */
 const getAllUsers = async () => {
   const users = await User.find();
   if (!users) {
@@ -56,4 +76,5 @@ const getAllUsers = async () => {
   return users;
 };
 
+// Export the service functions for use in controllers
 export default { createUser, findOneByNameOrId, getAllUsers };
