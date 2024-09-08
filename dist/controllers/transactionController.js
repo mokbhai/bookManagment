@@ -12,6 +12,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.getBooksByDateRange = exports.getBooksByUser = void 0;
 const transactionService_1 = __importDefault(require("../services/transactionService"));
 const issueBook = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
@@ -43,7 +44,7 @@ const returnBook = (req, res) => __awaiter(void 0, void 0, void 0, function* () 
 });
 const bookStatus = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const bookName = req.body;
+        const bookName = req.query.bookName;
         const transactions = yield transactionService_1.default.bookStatus(bookName);
         res.status(200).json({
             success: true,
@@ -55,6 +56,50 @@ const bookStatus = (req, res) => __awaiter(void 0, void 0, void 0, function* () 
         res.status(400).json({ message: error.message });
     }
 });
+const bookRevenue = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const bookName = req.query.bookName;
+        const amount = yield transactionService_1.default.bookRevenue(bookName);
+        res.status(200).json({
+            success: true,
+            message: bookName + " Book Revenue: ",
+            amount,
+        });
+    }
+    catch (error) {
+        res.status(400).json({ message: error.message });
+    }
+});
+const getBooksByUser = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const { userIdOrName } = req.query;
+        if (!userIdOrName) {
+            res.status(400).json({ message: "User ID or name is required" });
+            return;
+        }
+        const books = yield transactionService_1.default.getBooksIssuedToUser(userIdOrName);
+        res.status(200).json(books);
+    }
+    catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+});
+exports.getBooksByUser = getBooksByUser;
+const getBooksByDateRange = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const { startDate, endDate } = req.query;
+        if (!startDate || !endDate) {
+            res.status(400).json({ message: "Start date and end date are required" });
+            return;
+        }
+        const books = yield transactionService_1.default.getBooksIssuedInDateRange(new Date(startDate), new Date(endDate));
+        res.status(200).json(books);
+    }
+    catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+});
+exports.getBooksByDateRange = getBooksByDateRange;
 const createDummyTransations = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const transactions = yield transactionService_1.default.createDummyTransations();
@@ -64,4 +109,12 @@ const createDummyTransations = (req, res) => __awaiter(void 0, void 0, void 0, f
         res.status(400).json({ message: error.message });
     }
 });
-exports.default = { issueBook, returnBook, createDummyTransations, bookStatus };
+exports.default = {
+    issueBook,
+    returnBook,
+    createDummyTransations,
+    bookStatus,
+    bookRevenue,
+    getBooksByDateRange: exports.getBooksByDateRange,
+    getBooksByUser: exports.getBooksByUser,
+};

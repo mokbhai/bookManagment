@@ -9,6 +9,9 @@ const transactionController_1 = __importDefault(require("../controllers/transact
 const router = express_1.default.Router();
 router.post("/issue", transactionController_1.default.issueBook);
 router.post("/return", transactionController_1.default.returnBook);
-router.post("/book-status", transactionController_1.default.bookStatus);
+router.get("/bookStatus", transactionController_1.default.bookStatus);
+router.get("/bookRevenue", transactionController_1.default.bookRevenue);
+router.get("/booksByUser", transactionController_1.default.getBooksByUser);
+router.get("/booksByDateRange", transactionController_1.default.getBooksByDateRange);
 router.post("/dummy", transactionController_1.default.createDummyTransations);
 exports.default = router;

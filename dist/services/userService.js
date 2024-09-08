@@ -13,6 +13,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 // src/services/userService.ts
+const mongoose_1 = __importDefault(require("mongoose"));
 const user_1 = __importDefault(require("../models/user"));
 const validator_1 = __importDefault(require("validator"));
 const createUser = (userData) => __awaiter(void 0, void 0, void 0, function* () {
@@ -38,13 +39,21 @@ const createUser = (userData) => __awaiter(void 0, void 0, void 0, function* () 
     }
 });
 const findOneByNameOrId = (userIdOrName) => __awaiter(void 0, void 0, void 0, function* () {
-    const user = yield user_1.default.findOne({
-        $or: [{ userId: userIdOrName }, { name: new RegExp(userIdOrName, "i") }],
-    });
-    if (!user) {
-        throw new Error("User not found");
+    try {
+        const userId = mongoose_1.default.Types.ObjectId.isValid(userIdOrName)
+            ? new mongoose_1.default.Types.ObjectId(userIdOrName)
+            : null;
+        const user = yield user_1.default.findOne({
+            $or: [{ _id: userId }, { name: new RegExp(userIdOrName, "i") }],
+        });
+        if (!user) {
+            throw new Error("User not found");
+        }
+        return user;
     }
-    return user;
+    catch (error) {
+        throw new Error("Error in findOneByNameOrId: " + error.message);
+    }
 });
 const getAllUsers = () => __awaiter(void 0, void 0, void 0, function* () {
     const users = yield user_1.default.find();
