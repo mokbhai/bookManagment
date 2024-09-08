@@ -84,12 +84,12 @@ const bookStatus = async (bookName: string) => {
 
     // Find currently issued transaction (where returnDate is null)
     const currentlyIssued = transactions.find(
-      (transaction) => !transaction.returnDate
+      (transaction: any) => !transaction.returnDate
     );
 
     // Get list of all users who have issued the book
     const usersWhoIssued = transactions.map(
-      (transaction) => transaction.userId
+      (transaction: any) => transaction.userId
     );
 
     return {
@@ -123,9 +123,12 @@ const bookRevenue = async (bookName: string) => {
     }
 
     // Calculate total revenue
-    const totalRevenue: number = transactions.reduce((acc, transaction) => {
-      return acc + (transaction.totalRent || 0);
-    }, 0);
+    const totalRevenue: number = transactions.reduce(
+      (acc: number, transaction: any) => {
+        return acc + (transaction.totalRent || 0);
+      },
+      0
+    );
 
     return totalRevenue;
   } catch (error: any) {
