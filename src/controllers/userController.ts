@@ -18,7 +18,7 @@ const getAllUsers = async (req: Request, res: Response) => {
   try {
     const users = await userService.getAllUsers();
     res
-      .status(201)
+      .status(200)
       .json({ success: true, message: "Users Found successfully", users });
   } catch (error: any) {
     res.status(400).json({ message: error.message });
