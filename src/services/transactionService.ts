@@ -141,10 +141,10 @@ const getBooksIssuedToUser = async (userIdOrName: string) => {
       throw new Error("User not found");
     }
 
-    const transactions = await Transaction.find({ userId: user._id }).populate(
-      "bookId"
-    );
-    return transactions.map((transaction) => ({
+    const transactions: any = await Transaction.find({
+      userId: user._id,
+    }).populate("bookId");
+    return transactions.map((transaction: any) => ({
       bookName: transaction.bookId.bookName,
       issueDate: transaction.issueDate,
       returnDate: transaction.returnDate,
@@ -156,11 +156,11 @@ const getBooksIssuedToUser = async (userIdOrName: string) => {
 
 const getBooksIssuedInDateRange = async (startDate: Date, endDate: Date) => {
   try {
-    const transactions = await Transaction.find({
+    const transactions: any = await Transaction.find({
       issueDate: { $gte: startDate, $lte: endDate },
     }).populate("bookId userId");
 
-    return transactions.map((transaction) => ({
+    return transactions.map((transaction: any) => ({
       bookName: transaction.bookId.bookName,
       issuedTo: transaction.userId.name,
       issueDate: transaction.issueDate,
