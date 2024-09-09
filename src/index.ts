@@ -5,6 +5,10 @@ import connectDB from "./config/db";
 import Routes from "./routes/index";
 import cors from "cors";
 import logger from "./middleware/logger";
+import path from "path";
+import fs from "fs";
+import { fileURLToPath } from "url";
+import { marked } from "marked";
 
 const app = express();
 
@@ -17,13 +21,29 @@ app.use(
     origin: "http://localhost:3000", // Frontend URL
   })
 );
-app.use(logger);
+// app.use(logger);
 
-app.get("/api", (req, res) => {
-  res.send("Library Managment System");
+// ES6 way to get __dirname
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+// Route to serve README.md content as HTML
+app.get("/", (req, res) => {
+  const readmePath = path.join(__dirname, "../README.md");
+
+  fs.readFile(readmePath, "utf8", (err, data) => {
+    if (err) {
+      console.error("Error reading README.md:", err);
+      res.status(500).send("Error reading README.md");
+      return;
+    }
+    // Convert Markdown to HTML
+    const htmlContent = marked(data);
+    res.setHeader("Content-Type", "text/html");
+    res.send(htmlContent);
+  });
 });
 
-// Use your defined routes
 app.use("/api", Routes);
 
 // Catch-all route for handling 404 errors

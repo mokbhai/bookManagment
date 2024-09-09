@@ -1,32 +1,44 @@
-"use strict";
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
-Object.defineProperty(exports, "__esModule", { value: true });
 // src/index.ts
-const express_1 = __importDefault(require("express"));
-const body_parser_1 = __importDefault(require("body-parser"));
-const db_1 = __importDefault(require("./config/db"));
-const index_1 = __importDefault(require("./routes/index"));
-const cors_1 = __importDefault(require("cors"));
-const logger_1 = __importDefault(require("./middleware/logger"));
-const app = (0, express_1.default)();
+import express from "express";
+import bodyParser from "body-parser";
+import connectDB from "./config/db";
+import Routes from "./routes/index";
+import cors from "cors";
+import path from "path";
+import fs from "fs";
+import { fileURLToPath } from "url";
+import { marked } from "marked";
+const app = express();
 // Connect to the database
-(0, db_1.default)();
-app.use(body_parser_1.default.json());
-app.use((0, cors_1.default)({
+connectDB();
+app.use(bodyParser.json());
+app.use(cors({
     origin: "http://localhost:3000", // Frontend URL
 }));
-app.use(logger_1.default);
-app.get("/api", (req, res) => {
-    res.send("Library Managment System");
+// app.use(logger);
+// ES6 way to get __dirname
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+// Route to serve README.md content as HTML
+app.get("/", (req, res) => {
+    const readmePath = path.join(__dirname, "../README.md");
+    fs.readFile(readmePath, "utf8", (err, data) => {
+        if (err) {
+            console.error("Error reading README.md:", err);
+            res.status(500).send("Error reading README.md");
+            return;
+        }
+        // Convert Markdown to HTML
+        const htmlContent = marked(data);
+        res.setHeader("Content-Type", "text/html");
+        res.send(htmlContent);
+    });
 });
-// Use your defined routes
-app.use("/api", index_1.default);
+app.use("/api", Routes);
 // Catch-all route for handling 404 errors
 app.use((req, res, next) => {
     res.status(404).json({ error: "API endpoint not found" });
 });
 const PORT = process.env.PORT || 3002;
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
-exports.default = app;
+export default app;

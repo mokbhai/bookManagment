@@ -1,21 +1,7 @@
-"use strict";
-var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
-    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
-};
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
-Object.defineProperty(exports, "__esModule", { value: true });
 // Import necessary models and services
-const transaction_1 = __importDefault(require("../models/transaction"));
-const bookService_1 = __importDefault(require("./bookService"));
-const userService_1 = __importDefault(require("./userService"));
+import Transaction from "../models/transaction";
+import bookService from "./bookService";
+import userService from "./userService";
 /**
  * Issues a book to a user by creating a transaction.
  *
@@ -23,22 +9,22 @@ const userService_1 = __importDefault(require("./userService"));
  * @returns The created transaction document
  * @throws Error if the book cannot be issued
  */
-const issueBook = (data) => __awaiter(void 0, void 0, void 0, function* () {
+const issueBook = async (data) => {
     try {
-        const book = yield bookService_1.default.findOneByName(data.bookName);
-        const user = yield userService_1.default.findOneByNameOrId(data.userIdOrName);
-        const transaction = new transaction_1.default({
+        const book = await bookService.findOneByName(data.bookName);
+        const user = await userService.findOneByNameOrId(data.userIdOrName);
+        const transaction = new Transaction({
             bookId: book._id,
             userId: user._id,
             issueDate: new Date(data.issueDate),
         });
-        yield transaction.save();
+        await transaction.save();
         return transaction;
     }
     catch (error) {
         throw new Error(`Unable to issue book: ${error.message}`);
     }
-});
+};
 /**
  * Returns a book by updating the transaction with a return date and calculating total rent.
  *
@@ -46,11 +32,11 @@ const issueBook = (data) => __awaiter(void 0, void 0, void 0, function* () {
  * @returns The updated transaction document
  * @throws Error if the book cannot be returned
  */
-const returnBook = (data) => __awaiter(void 0, void 0, void 0, function* () {
+const returnBook = async (data) => {
     try {
-        const book = yield bookService_1.default.findOneByName(data.bookName);
-        const user = yield userService_1.default.findOneByNameOrId(data.userIdOrName);
-        const transaction = yield transaction_1.default.findOne({
+        const book = await bookService.findOneByName(data.bookName);
+        const user = await userService.findOneByNameOrId(data.userIdOrName);
+        const transaction = await Transaction.findOne({
             bookId: book._id,
             userId: user._id,
             returnDate: { $exists: false },
@@ -60,13 +46,13 @@ const returnBook = (data) => __awaiter(void 0, void 0, void 0, function* () {
         }
         transaction.returnDate = new Date();
         transaction.totalRent = calculateTotalRent(transaction.issueDate, transaction.returnDate, book.rentPerDay);
-        yield transaction.save();
+        await transaction.save();
         return transaction;
     }
     catch (error) {
         throw new Error(`Unable to return book: ${error.message}`);
     }
-});
+};
 /**
  * Retrieves the status of a book, including total issued count and current issuance status.
  *
@@ -74,13 +60,13 @@ const returnBook = (data) => __awaiter(void 0, void 0, void 0, function* () {
  * @returns An object containing the total issued count, current issuance status, and users who issued the book
  * @throws Error if the book status cannot be retrieved
  */
-const bookStatus = (bookName) => __awaiter(void 0, void 0, void 0, function* () {
+const bookStatus = async (bookName) => {
     if (!bookName) {
         throw new Error("Book name is required");
     }
     try {
-        const book = yield bookService_1.default.findOneByName(bookName);
-        const transactions = yield transaction_1.default.find({ bookId: book._id });
+        const book = await bookService.findOneByName(bookName);
+        const transactions = await Transaction.find({ bookId: book._id });
         if (transactions.length === 0)
             throw new Error("No transactions found for this book: " + bookName);
         const currentlyIssued = transactions.find((transaction) => !transaction.returnDate);
@@ -96,7 +82,7 @@ const bookStatus = (bookName) => __awaiter(void 0, void 0, void 0, function* () 
     catch (error) {
         throw new Error("Error in fetching bookStatus: " + error.message);
     }
-});
+};
 /**
  * Calculates the total revenue generated by a book based on completed transactions.
  *
@@ -104,16 +90,16 @@ const bookStatus = (bookName) => __awaiter(void 0, void 0, void 0, function* () 
  * @returns The total revenue generated by the book
  * @throws Error if the revenue cannot be calculated
  */
-const bookRevenue = (bookName) => __awaiter(void 0, void 0, void 0, function* () {
+const bookRevenue = async (bookName) => {
     if (!bookName) {
         throw new Error("Book name is required");
     }
     try {
-        const book = yield bookService_1.default.findOneByName(bookName);
+        const book = await bookService.findOneByName(bookName);
         if (!book) {
             throw new Error("Book not found: " + bookName);
         }
-        const transactions = yield transaction_1.default.find({ bookId: book._id });
+        const transactions = await Transaction.find({ bookId: book._id });
         if (transactions.length === 0) {
             throw new Error("No revenue generated by book: " + bookName);
         }
@@ -126,7 +112,7 @@ const bookRevenue = (bookName) => __awaiter(void 0, void 0, void 0, function* ()
         console.error("Error calculating book revenue: ", error.message);
         throw error;
     }
-});
+};
 /**
  * Retrieves the list of books issued to a specific user.
  *
@@ -134,13 +120,13 @@ const bookRevenue = (bookName) => __awaiter(void 0, void 0, void 0, function* ()
  * @returns An array of books issued to the user
  * @throws Error if the books cannot be retrieved
  */
-const getBooksIssuedToUser = (userIdOrName) => __awaiter(void 0, void 0, void 0, function* () {
+const getBooksIssuedToUser = async (userIdOrName) => {
     try {
-        const user = yield userService_1.default.findOneByNameOrId(userIdOrName);
+        const user = await userService.findOneByNameOrId(userIdOrName);
         if (!user) {
             throw new Error("User not found");
         }
-        const transactions = yield transaction_1.default.find({
+        const transactions = await Transaction.find({
             userId: user._id,
         }).populate("bookId");
         return transactions.map((transaction) => ({
@@ -152,7 +138,7 @@ const getBooksIssuedToUser = (userIdOrName) => __awaiter(void 0, void 0, void 0,
     catch (error) {
         throw new Error(`Unable to retrieve books for user: ${error.message}`);
     }
-});
+};
 /**
  * Retrieves the list of books issued within a specified date range.
  *
@@ -161,9 +147,9 @@ const getBooksIssuedToUser = (userIdOrName) => __awaiter(void 0, void 0, void 0,
  * @returns An array of books issued within the date range
  * @throws Error if the books cannot be retrieved
  */
-const getBooksIssuedInDateRange = (startDate, endDate) => __awaiter(void 0, void 0, void 0, function* () {
+const getBooksIssuedInDateRange = async (startDate, endDate) => {
     try {
-        const transactions = yield transaction_1.default.find({
+        const transactions = await Transaction.find({
             issueDate: { $gte: startDate, $lte: endDate },
         }).populate("bookId userId");
         return transactions.map((transaction) => ({
@@ -175,7 +161,7 @@ const getBooksIssuedInDateRange = (startDate, endDate) => __awaiter(void 0, void
     catch (error) {
         throw new Error(`Unable to retrieve books for date range: ${error.message}`);
     }
-});
+};
 /**
  * Helper function to calculate total rent based on issue and return dates.
  *
@@ -193,9 +179,9 @@ const calculateTotalRent = (issueDate, returnDate, rentPerDay) => {
  *
  * @returns An object containing arrays of issued and returned transactions
  */
-const createDummyTransations = () => __awaiter(void 0, void 0, void 0, function* () {
-    const books = yield bookService_1.default.findBooks();
-    const users = yield userService_1.default.getAllUsers();
+const createDummyTransations = async () => {
+    const books = await bookService.findBooks();
+    const users = await userService.getAllUsers();
     const generateIssueDate = () => {
         return new Date();
     };
@@ -215,15 +201,15 @@ const createDummyTransations = () => __awaiter(void 0, void 0, void 0, function*
             userIdOrName: user.name,
             returnDate: new Date(issueDate.getTime() + 7 * 24 * 60 * 60 * 1000),
         };
-        const issuedTransaction = yield issueBook(issueTransaction);
-        const returnedTransaction = yield returnBook(returnTransaction);
+        const issuedTransaction = await issueBook(issueTransaction);
+        const returnedTransaction = await returnBook(returnTransaction);
         transactions.push(issuedTransaction);
         returnTransactions.push(returnTransaction);
     }
     return { transactions, returnTransactions };
-});
+};
 // Export the service functions for use in controllers
-exports.default = {
+export default {
     issueBook,
     returnBook,
     createDummyTransations,

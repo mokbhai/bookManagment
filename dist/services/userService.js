@@ -1,20 +1,6 @@
-"use strict";
-var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
-    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
-};
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
-Object.defineProperty(exports, "__esModule", { value: true });
-const mongoose_1 = __importDefault(require("mongoose"));
-const user_1 = __importDefault(require("../models/user"));
-const validator_1 = __importDefault(require("validator"));
+import mongoose from "mongoose";
+import User from "../models/user";
+import validator from "validator";
 /**
  * Service function to create a new user.
  * Validates the user data and saves it to the database.
@@ -23,13 +9,13 @@ const validator_1 = __importDefault(require("validator"));
  * @returns The created user document
  * @throws Error if validation fails or user creation is unsuccessful
  */
-const createUser = (userData) => __awaiter(void 0, void 0, void 0, function* () {
+const createUser = async (userData) => {
     if (!userData.name || typeof userData.name !== "string") {
         throw new Error("Invalid or missing name");
     }
     // Validate email
     if (!userData.email ||
-        (userData.email && !validator_1.default.isEmail(userData.email))) {
+        (userData.email && !validator.isEmail(userData.email))) {
         throw new Error("Invalid email format");
     }
     // Validate phone if provided
@@ -37,14 +23,14 @@ const createUser = (userData) => __awaiter(void 0, void 0, void 0, function* () 
         throw new Error("Invalid phone format");
     }
     try {
-        const user = new user_1.default(userData);
-        yield user.save();
+        const user = new User(userData);
+        await user.save();
         return user;
     }
     catch (error) {
         throw new Error(`Unable to create user: ${error.message}`);
     }
-});
+};
 /**
  * Service function to find a user by either their ID or name.
  *
@@ -52,12 +38,12 @@ const createUser = (userData) => __awaiter(void 0, void 0, void 0, function* () 
  * @returns The found user document
  * @throws Error if the user is not found or if an error occurs during the search
  */
-const findOneByNameOrId = (userIdOrName) => __awaiter(void 0, void 0, void 0, function* () {
+const findOneByNameOrId = async (userIdOrName) => {
     try {
-        const userId = mongoose_1.default.Types.ObjectId.isValid(userIdOrName)
-            ? new mongoose_1.default.Types.ObjectId(userIdOrName)
+        const userId = mongoose.Types.ObjectId.isValid(userIdOrName)
+            ? new mongoose.Types.ObjectId(userIdOrName)
             : null;
-        const user = yield user_1.default.findOne({
+        const user = await User.findOne({
             $or: [{ _id: userId }, { name: new RegExp(userIdOrName, "i") }],
         });
         if (!user) {
@@ -68,19 +54,19 @@ const findOneByNameOrId = (userIdOrName) => __awaiter(void 0, void 0, void 0, fu
     catch (error) {
         throw new Error("Error in findOneByNameOrId: " + error.message);
     }
-});
+};
 /**
  * Service function to retrieve all users from the database.
  *
  * @returns An array of user documents
  * @throws Error if no users are found
  */
-const getAllUsers = () => __awaiter(void 0, void 0, void 0, function* () {
-    const users = yield user_1.default.find();
+const getAllUsers = async () => {
+    const users = await User.find();
     if (!users) {
         throw new Error("No User found");
     }
     return users;
-});
+};
 // Export the service functions for use in controllers
-exports.default = { createUser, findOneByNameOrId, getAllUsers };
+export default { createUser, findOneByNameOrId, getAllUsers };

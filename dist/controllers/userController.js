@@ -1,28 +1,14 @@
-"use strict";
-var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
-    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
-};
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
-Object.defineProperty(exports, "__esModule", { value: true });
-const userService_1 = __importDefault(require("../services/userService"));
+import userService from "../services/userService";
 /**
  * Controller function to create a new user.
  *
  * @param req - Express request object containing user data in the body
  * @param res - Express response object used to send back the HTTP response
  */
-const createUser = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+const createUser = async (req, res) => {
     try {
         const userData = req.body;
-        const user = yield userService_1.default.createUser(userData);
+        const user = await userService.createUser(userData);
         res
             .status(201)
             .json({ success: true, message: "User created successfully", user });
@@ -30,16 +16,16 @@ const createUser = (req, res) => __awaiter(void 0, void 0, void 0, function* () 
     catch (error) {
         res.status(400).json({ message: error.message });
     }
-});
+};
 /**
  * Controller function to retrieve all users.
  *
  * @param req - Express request object
  * @param res - Express response object used to send back the HTTP response
  */
-const getAllUsers = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+const getAllUsers = async (req, res) => {
     try {
-        const users = yield userService_1.default.getAllUsers();
+        const users = await userService.getAllUsers();
         res
             .status(200)
             .json({ success: true, message: "Users found successfully", users });
@@ -47,5 +33,5 @@ const getAllUsers = (req, res) => __awaiter(void 0, void 0, void 0, function* ()
     catch (error) {
         res.status(400).json({ message: error.message });
     }
-});
-exports.default = { createUser, getAllUsers };
+};
+export default { createUser, getAllUsers };
