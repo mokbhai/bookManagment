@@ -1,4 +1,3 @@
-// src/index.ts
 import express from "express";
 import bodyParser from "body-parser";
 import connectDB from "./config/db";
@@ -22,13 +21,11 @@ app.use(
 );
 // app.use(logger);
 
-// ES6 way to get __dirname
-const __dirname = path.dirname(__filename);
+// Use __dirname directly in CommonJS
+const readmePath = path.join(__dirname, "../README.md");
 
 // Route to serve README.md content as HTML
 app.get("/", (req, res) => {
-  const readmePath = path.join(__dirname, "../README.md");
-
   fs.readFile(readmePath, "utf8", (err, data) => {
     if (err) {
       console.error("Error reading README.md:", err);

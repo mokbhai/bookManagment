@@ -3,7 +3,6 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-// src/index.ts
 const express_1 = __importDefault(require("express"));
 const body_parser_1 = __importDefault(require("body-parser"));
 const db_1 = __importDefault(require("./config/db"));
@@ -20,11 +19,10 @@ app.use((0, cors_1.default)({
     origin: "http://localhost:3000", // Frontend URL
 }));
 // app.use(logger);
-// ES6 way to get __dirname
-const __dirname = path_1.default.dirname(__filename);
+// Use __dirname directly in CommonJS
+const readmePath = path_1.default.join(__dirname, "../README.md");
 // Route to serve README.md content as HTML
 app.get("/", (req, res) => {
-    const readmePath = path_1.default.join(__dirname, "../README.md");
     fs_1.default.readFile(readmePath, "utf8", (err, data) => {
         if (err) {
             console.error("Error reading README.md:", err);
