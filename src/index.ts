@@ -24,7 +24,6 @@ app.use(
 // app.use(logger);
 
 // ES6 way to get __dirname
-const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 // Route to serve README.md content as HTML
