@@ -1,5 +1,19 @@
+"use strict";
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
 // Import the Book model and IBook interface
-import Book from "../models/book";
+const book_1 = __importDefault(require("../models/book"));
 /**
  * Creates a new book in the database.
  *
@@ -7,23 +21,23 @@ import Book from "../models/book";
  * @returns The created book document
  * @throws Error if the book cannot be created
  */
-const createBook = async (bookData) => {
+const createBook = (bookData) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const book = new Book(bookData);
-        await book.save();
+        const book = new book_1.default(bookData);
+        yield book.save();
         return book;
     }
     catch (error) {
         throw new Error(`Unable to create book: ${error.message}`);
     }
-};
+});
 /**
  * Finds books based on query parameters.
  *
  * @param query - The query parameters to filter books
  * @returns An array of books that match the query criteria
  */
-const findBooks = async (query) => {
+const findBooks = (query) => __awaiter(void 0, void 0, void 0, function* () {
     const filter = {};
     if (query && query.term) {
         filter.bookName = new RegExp(query.term, "i");
@@ -37,8 +51,8 @@ const findBooks = async (query) => {
     if (query && query.category) {
         filter.category = query.category;
     }
-    return await Book.find(filter);
-};
+    return yield book_1.default.find(filter);
+});
 /**
  * Finds a book by its name.
  *
@@ -46,12 +60,12 @@ const findBooks = async (query) => {
  * @returns The found book document
  * @throws Error if the book is not found
  */
-const findOneByName = async (bookName) => {
-    const book = await Book.findOne({ bookName: new RegExp(bookName, "i") });
+const findOneByName = (bookName) => __awaiter(void 0, void 0, void 0, function* () {
+    const book = yield book_1.default.findOne({ bookName: new RegExp(bookName, "i") });
     if (!book) {
         throw new Error("Book not found");
     }
     return book;
-};
+});
 // Export the service functions for use in controllers
-export default { createBook, findBooks, findOneByName };
+exports.default = { createBook, findBooks, findOneByName };

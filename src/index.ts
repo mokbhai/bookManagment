@@ -7,7 +7,6 @@ import cors from "cors";
 import logger from "./middleware/logger";
 import path from "path";
 import fs from "fs";
-import { fileURLToPath } from "url";
 import { marked } from "marked";
 
 const app = express();
